@@ -38,10 +38,6 @@ class GitSearchRepo extends Component {
     }
   }
 
-  /*handlePageChange = (page) => {
-    this.setState({ currentPage: page });
-  };*/
-
   handleSearchChange = async (query) => {
     this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
@@ -124,22 +120,22 @@ class GitSearchRepo extends Component {
             onBlur={this.blurHandler}
             onKeyPress={this.keyPressHandler}
           />
-          <nav>
-            <ul className="pagination">
-              {rangeStart > 1 && (
-                <li className="page-item">
-                  <a className="page-link" onClick={() => this.onPrevPage()}>
-                    Prev {pageSize}
-                  </a>
-                </li>
-              )}
-              {total_count > rangeEnd && (
-                <a className="page-link" onClick={() => this.onNextPage()}>
-                  Next {pageSize}
-                </a>
-              )}
-            </ul>
-          </nav>
+          {rangeStart > 1 && (
+            <a
+              className="btn btn-primary m-1"
+              onClick={() => this.onPrevPage()}
+            >
+              Prev {pageSize}
+            </a>
+          )}
+          {total_count > rangeEnd && (
+            <a
+              className="btn btn-primary m-1"
+              onClick={() => this.onNextPage()}
+            >
+              Next {pageSize}
+            </a>
+          )}
           <GitSearchRepoResultTable
             gitSearchRepoResult={this.state.gitSearchRepoResult}
             sortColumn={sortColumn}
