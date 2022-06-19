@@ -1,0 +1,4 @@
+{
+  "gitHubApiSearchRepoUrl": "https://api.github.com/search/repositories",
+  "gitHubReadmeUrl": "https://api.github.com/repos/{owner}/{repo}/readme"
+}
