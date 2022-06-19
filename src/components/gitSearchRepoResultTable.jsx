@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Table from "./common/table";
-import { gitHubReadmeUrl } from "../config.json";
 
 class GitSearchRepoResultTable extends Component {
   columns = [
@@ -9,7 +8,6 @@ class GitSearchRepoResultTable extends Component {
       path: "full_name",
       label: "Full Name",
     },
-    /*{ path: "description", label: "Description" },*/
     { path: "owner.login", label: "Owner" },
     {
       path: "html_url",
