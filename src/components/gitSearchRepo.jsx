@@ -99,8 +99,6 @@ class GitSearchRepo extends Component {
         <div>
           <p>There are no matched git repository.</p>
           <SearchBox
-            value={searchQuery}
-            onChange={this.handleSearchChange}
             onBlur={this.blurHandler}
             onKeyPress={this.keyPressHandler}
           />

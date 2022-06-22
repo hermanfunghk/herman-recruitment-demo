@@ -7,8 +7,6 @@ const SearchBox = ({ value, onChange, onBlur, onKeyPress }) => {
       name="query"
       className="form-control my-3"
       placeholder="Search..."
-      value={value}
-      onChange={(e) => onChange(e.currentTarget.value)}
       onBlur={(e) => onBlur(e.currentTarget.value)}
       onKeyPress={(e) => onKeyPress(e)}
     />
