@@ -64,7 +64,7 @@ const GitSearchRepo = () => {
     setSearchQuery(e.currentTarget.value);
     setSelectedGenre(null);
     setCurrentPage(1);
-    if (e.key === "Enter") await this.searchRepo();
+    if (e.key === "Enter") await searchRepo();
   };
 
   const resultRangeStart = () => {
