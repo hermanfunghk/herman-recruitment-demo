@@ -1,8 +1,12 @@
-import React, { Component } from "react";
+import React from "react";
 import Table from "./common/table";
 
-class GitSearchRepoResultTable extends Component {
-  columns = [
+const GitSearchRepoResultTable = ({
+  gitSearchRepoResult,
+  onSort,
+  sortColumn,
+}) => {
+  const columns = [
     { path: "stargazers_count", sortPath: "stars", label: "Star" },
     {
       path: "full_name",
@@ -20,18 +24,14 @@ class GitSearchRepoResultTable extends Component {
     },
   ];
 
-  render() {
-    const { gitSearchRepoResult, onSort, sortColumn } = this.props;
-
-    return (
-      <Table
-        columns={this.columns}
-        data={gitSearchRepoResult}
-        sortColumn={sortColumn}
-        onSort={onSort}
-      />
-    );
-  }
-}
+  return (
+    <Table
+      columns={columns}
+      data={gitSearchRepoResult}
+      sortColumn={sortColumn}
+      onSort={onSort}
+    />
+  );
+};
 
 export default GitSearchRepoResultTable;

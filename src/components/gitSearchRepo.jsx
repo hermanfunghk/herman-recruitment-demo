@@ -1,148 +1,144 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import GitSearchRepoResultTable from "./gitSearchRepoResultTable";
 import { getGitHubSearchRepo } from "../services/gitHubSearchRepoService";
 //import _ from "lodash";
 import SearchBox from "./searchBox";
 
-class GitSearchRepo extends Component {
-  state = {
-    gitSearchRepoResult: [],
-    total_count: 0,
-    currentPage: 1,
-    pageSize: 25,
-    searchQuery: "",
-    selectedGenre: null,
-    sortColumn: { path: "stargazers_count", sortPath: "stars", order: "desc" },
-  };
+const GitSearchRepo = () => {
+  const [gitSearchRepoResult, setGitSearchRepoResult] = useState([]);
+  const [total_count, setTotal_count] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [searchQuery, setSearchQuery] = useState("oracle");
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [sortColumn, setSortColumn] = useState({
+    path: "stargazers_count",
+    sortPath: "stars",
+    order: "desc",
+  });
 
-  async componentDidMount() {
-    this.searchRepo(this.state.currentPage, this.state.sortColumn);
-  }
-
-  async searchRepo(currentPage, sortColumn) {
-    if (this.state.searchQuery.trim() === "")
-      this.setState({ gitSearchRepoResult: [] });
+  const searchRepo = async () => {
+    if (searchQuery.trim() === "") setGitSearchRepoResult([]);
     else {
       const {
         data: { items: gitSearchRepoResult, total_count },
       } = await getGitHubSearchRepo(
-        this.state.searchQuery,
-        this.state.pageSize,
+        searchQuery,
+        pageSize,
         currentPage,
         sortColumn
       );
 
       gitSearchRepoResult.map((i) => (i._id = i.id));
 
-      this.setState({ gitSearchRepoResult, currentPage, total_count });
+      setGitSearchRepoResult(gitSearchRepoResult);
+      setTotal_count(total_count);
     }
-  }
-
-  handleSearchChange = async (query) => {
-    this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
 
-  handleSort = (sortColumn) => {
-    this.setState({ sortColumn });
+  useEffect(() => {
+    // call the function
+    searchRepo()
+      // make sure to catch any error
+      .catch(console.error);
+  }, []);
+
+  const handleSearchChange = async (query) => {
+    setSearchQuery(query);
+    setSelectedGenre(null);
+    setCurrentPage(1);
   };
 
-  blurHandler = async (query) => {
-    this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
-    await this.searchRepo(1, this.state.sortColumn);
+  const handleSort = (sortColumn) => {
+    setSortColumn(sortColumn);
   };
 
-  keyPressHandler = async (e) => {
-    this.setState({
-      searchQuery: e.currentTarget.value,
-      selectedGenre: null,
-      currentPage: 1,
-    });
-    if (e.key === "Enter") await this.searchRepo(1, this.state.sortColumn);
+  const blurHandler = async (query) => {
+    setSearchQuery(query);
+    setSelectedGenre(null);
+    setCurrentPage(1);
+    await searchRepo();
   };
 
-  resultRangeStart = () => {
-    return (this.state.currentPage - 1) * this.state.pageSize + 1;
+  const keyPressHandler = async (e) => {
+    setSearchQuery(e.currentTarget.value);
+    setSelectedGenre(null);
+    setCurrentPage(1);
+    if (e.key === "Enter") await this.searchRepo();
   };
 
-  resultRangeEnd = () => {
-    return this.resultRangeStart() + this.state.gitSearchRepoResult.length - 1;
+  const resultRangeStart = () => {
+    return (currentPage - 1) * pageSize + 1;
   };
 
-  onNextPage = async () => {
-    this.searchRepo(this.state.currentPage + 1, this.state.sortColumn);
+  const resultRangeEnd = () => {
+    return resultRangeStart() + gitSearchRepoResult.length - 1;
   };
 
-  onPrevPage = async () => {
-    this.searchRepo(this.state.currentPage - 1, this.state.sortColumn);
+  const onNextPage = async () => {
+    setCurrentPage(currentPage + 1);
+    setSortColumn(sortColumn);
+    searchRepo();
   };
 
-  handleSort = (sortColumn) => {
+  const onPrevPage = async () => {
+    setCurrentPage(currentPage - 1);
+    setSortColumn(sortColumn);
+    searchRepo();
+  };
+
+  /*const handleSort = (sortColumn) => {
     this.setState({ sortColumn });
     this.searchRepo(this.state.currentPage, sortColumn);
-  };
+  };*/
 
-  render() {
-    const {
-      total_count,
-      pageSize,
-      sortColumn,
-      searchQuery,
-      gitSearchRepoResult,
-    } = this.state;
+  const { length: count } = gitSearchRepoResult;
+  const rangeStart = resultRangeStart();
+  const rangeEnd = resultRangeEnd();
 
-    const { length: count } = gitSearchRepoResult;
-    const rangeStart = this.resultRangeStart();
-    const rangeEnd = this.resultRangeEnd();
-
-    if (count === 0)
-      return (
-        <div>
-          <p>There are no matched git repository.</p>
-          <SearchBox
-            onBlur={this.blurHandler}
-            onKeyPress={this.keyPressHandler}
-          />
-        </div>
-      );
-
+  if (count === 0)
     return (
-      <div className="row">
-        <div className="col">
-          <p>Total {total_count} git repositories found.</p>
-          <p>
-            Showing {rangeStart} - {rangeEnd} git repositories.
-          </p>
-          <SearchBox
-            value={searchQuery}
-            onChange={this.handleSearchChange}
-            onBlur={this.blurHandler}
-            onKeyPress={this.keyPressHandler}
-          />
-          {rangeStart > 1 && (
-            <a
-              className="btn btn-primary m-1"
-              onClick={() => this.onPrevPage()}
-            >
-              Prev {pageSize}
-            </a>
-          )}
-          {total_count > rangeEnd && (
-            <a
-              className="btn btn-primary m-1"
-              onClick={() => this.onNextPage()}
-            >
-              Next {pageSize}
-            </a>
-          )}
-          <GitSearchRepoResultTable
-            gitSearchRepoResult={this.state.gitSearchRepoResult}
-            sortColumn={sortColumn}
-            onSort={this.handleSort}
-          />
-        </div>
+      <div>
+        <p>There are no matched git repository.</p>
+        <SearchBox
+          defaultValue={searchQuery}
+          onBlur={blurHandler}
+          onKeyPress={keyPressHandler}
+        />
       </div>
     );
-  }
-}
+
+  return (
+    <div className="row">
+      <div className="col">
+        <p>Total {total_count} git repositories found.</p>
+        <p>
+          Showing {resultRangeStart()} - {resultRangeEnd()} git repositories.
+        </p>
+        <SearchBox
+          defaultValue={searchQuery}
+          onChange={handleSearchChange}
+          onBlur={blurHandler}
+          onKeyPress={keyPressHandler}
+        />
+        {rangeStart > 1 && (
+          <a className="btn btn-primary m-1" onClick={() => onPrevPage()}>
+            Prev {pageSize}
+          </a>
+        )}
+        {total_count > rangeEnd && (
+          <a className="btn btn-primary m-1" onClick={() => onNextPage()}>
+            Next {pageSize}
+          </a>
+        )}
+        <GitSearchRepoResultTable
+          gitSearchRepoResult={gitSearchRepoResult}
+          sortColumn={sortColumn}
+          onSort={handleSort}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default GitSearchRepo;
