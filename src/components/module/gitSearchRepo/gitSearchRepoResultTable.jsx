@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "./common/table";
+import Table from "../../common/table";
 
 const GitSearchRepoResultTable = ({
   gitSearchRepoResult,

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import GitSearchRepoResultTable from "./gitSearchRepoResultTable";
-import { getGitHubSearchRepo } from "../services/gitHubSearchRepoService";
+import { getGitHubSearchRepo } from "../../../services/gitHubSearchRepoService";
 //import _ from "lodash";
-import SearchBox from "./searchBox";
+import SearchBox from "../../common/searchBox";
 
 const GitSearchRepo = () => {
   const [gitSearchRepoResult, setGitSearchRepoResult] = useState([]);
   const [total_count, setTotal_count] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  // eslint-disable-next-line
   const [pageSize, setPageSize] = useState(25);
   const [searchQuery, setSearchQuery] = useState("oracle");
-  const [selectedGenre, setSelectedGenre] = useState(null);
   const [sortColumn, setSortColumn] = useState({
     path: "stargazers_count",
     sortPath: "stars",
@@ -45,7 +45,6 @@ const GitSearchRepo = () => {
 
   const handleSearchChange = async (query) => {
     setSearchQuery(query);
-    setSelectedGenre(null);
     setCurrentPage(1);
   };
 
@@ -53,16 +52,14 @@ const GitSearchRepo = () => {
     setSortColumn(sortColumn);
   };
 
-  const blurHandler = async (query) => {
-    setSearchQuery(query);
-    setSelectedGenre(null);
+  const blurHandler = async (e) => {
+    setSearchQuery(e.currentTarget.value);
     setCurrentPage(1);
     await searchRepo();
   };
 
   const keyPressHandler = async (e) => {
     setSearchQuery(e.currentTarget.value);
-    setSelectedGenre(null);
     setCurrentPage(1);
     if (e.key === "Enter") await searchRepo();
   };

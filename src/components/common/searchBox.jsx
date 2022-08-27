@@ -8,8 +8,9 @@ const SearchBox = ({ defaultValue, onChange, onBlur, onKeyPress }) => {
       className="form-control my-3"
       placeholder="Search..."
       defaultValue={defaultValue}
-      onBlur={(e) => onBlur(e.currentTarget.value)}
+      onBlur={(e) => onBlur(e)}
       onKeyPress={(e) => onKeyPress(e)}
+      onChange={(e) => onChange(e)}
     />
   );
 };
