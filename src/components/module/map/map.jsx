@@ -15,7 +15,6 @@ const Map = () => {
   });
 
   const [map, setMap] = useState(null);
-  const [tmp, setTmp] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(11);
   const [center, setCenter] = useState({ lat: 22.483364, lng: 114.139587 });
 
@@ -169,13 +168,16 @@ const Map = () => {
 
   const displayMarkerInfo = (position) => {
     setZoomIndividualPin(position);
-  }
+  };
   const setZoomIndividualPin = (position) => {
-    setCenter({lat: Number(position.lat()) + ((tmp % 2) * 0.00001), lng: Number(position.lng()) + ((tmp % 2) * 0.00001)});
-    setZoomLevel(14 + (tmp % 2 * 0.001));
+    let rand = Math.random() * 0.00001;
+    setCenter({
+      lat: Number(position.lat()) + rand,
+      lng: Number(position.lng()) + rand,
+    });
 
-    setTmp(tmp + 1);
-  }
+    setZoomLevel(14 + rand);
+  };
 
   if (!isLoaded) return <p>Loading...</p>;
 
@@ -203,10 +205,9 @@ const Map = () => {
           }}
           label="HK"
           onClick={() => {
-            displayMarkerInfo(new window.google.maps.LatLng(
-              homeHK.lat,
-              homeHK.lng
-            ));
+            displayMarkerInfo(
+              new window.google.maps.LatLng(homeHK.lat, homeHK.lng)
+            );
             setTimeout(() => alert("This is my home in Hong Kong !"), 500);
           }}
         />
@@ -222,10 +223,9 @@ const Map = () => {
           }}
           label="MY"
           onClick={() => {
-            displayMarkerInfo(new window.google.maps.LatLng(
-              homeMY.lat,
-              homeMY.lng
-            ));
+            displayMarkerInfo(
+              new window.google.maps.LatLng(homeMY.lat, homeMY.lng)
+            );
             setTimeout(() => alert("This is my home in Malaysia !"), 500);
           }}
         />
@@ -241,10 +241,9 @@ const Map = () => {
           }}
           label="UK"
           onClick={() => {
-            displayMarkerInfo(new window.google.maps.LatLng(
-              homeUK.lat,
-              homeUK.lng
-            ));
+            displayMarkerInfo(
+              new window.google.maps.LatLng(homeUK.lat, homeUK.lng)
+            );
             setTimeout(() => alert("This is my home in United Kingdom !"), 500);
           }}
         />
