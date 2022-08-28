@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   GoogleMap,
   useLoadScript,
@@ -14,7 +14,11 @@ const Map = () => {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_APIKEY,
   });
 
-  const [map, setMap] = React.useState(null);
+  const [map, setMap] = useState(null);
+  const [tmp, setTmp] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(11);
+  const [center, setCenter] = useState({ lat: 22.483364, lng: 114.139587 });
+
   const homeHK = useMemo(() => ({ lat: 22.483364, lng: 114.139587 }), []);
   const homeMY = useMemo(() => ({ lat: 2.970399, lng: 101.659614 }), []);
   const homeUK = useMemo(() => ({ lat: 53.3943374, lng: -2.6068253 }), []);
@@ -96,6 +100,7 @@ const Map = () => {
       });
     },
   };*/
+
   const setGoogleMapMarkers = (map) => {
     var positions = locations.map((position) => {
       var newPosition = new window.google.maps.LatLng(
@@ -137,9 +142,9 @@ const Map = () => {
           },
         });
         marker.count = position.count;
-        /*marker.addListener("click", () => {
-          props.displayMarkerInfo(position.id);
-        });*/
+        marker.addListener("click", (e) => {
+          displayMarkerInfo(position);
+        });
         return marker;
       });
 
@@ -162,6 +167,16 @@ const Map = () => {
     new MarkerClusterer({ markers, map, renderer: rendererCluster });
   };
 
+  const displayMarkerInfo = (position) => {
+    setZoomIndividualPin(position);
+  }
+  const setZoomIndividualPin = (position) => {
+    setCenter({lat: Number(position.lat()) + ((tmp % 2) * 0.00001), lng: Number(position.lng()) + ((tmp % 2) * 0.00001)});
+    setZoomLevel(14 + (tmp % 2 * 0.001));
+
+    setTmp(tmp + 1);
+  }
+
   if (!isLoaded) return <p>Loading...</p>;
 
   return (
@@ -170,8 +185,8 @@ const Map = () => {
       <button onClick={() => boundByHome(map)}>Home Area</button>
       <button onClick={() => boundByAustralia(map)}>Australia Area</button>
       <GoogleMap
-        zoom={18}
-        center={homeHK}
+        zoom={zoomLevel}
+        center={center}
         mapContainerClassName="map-container"
         onLoad={onLoad}
         onUnmount={onUnmount}
@@ -187,7 +202,13 @@ const Map = () => {
             scale: 0.075,
           }}
           label="HK"
-          onClick={() => alert("This is my home in Hong Kong !")}
+          onClick={() => {
+            displayMarkerInfo(new window.google.maps.LatLng(
+              homeHK.lat,
+              homeHK.lng
+            ));
+            setTimeout(() => alert("This is my home in Hong Kong !"), 500);
+          }}
         />
         <Marker
           position={homeMY}
@@ -200,7 +221,13 @@ const Map = () => {
             scale: 0.075,
           }}
           label="MY"
-          onClick={() => alert("This is my home in Malaysia !")}
+          onClick={() => {
+            displayMarkerInfo(new window.google.maps.LatLng(
+              homeMY.lat,
+              homeMY.lng
+            ));
+            setTimeout(() => alert("This is my home in Malaysia !"), 500);
+          }}
         />
         <Marker
           position={homeUK}
@@ -213,7 +240,13 @@ const Map = () => {
             scale: 0.075,
           }}
           label="UK"
-          onClick={() => alert("This is my home in United Kingdom !")}
+          onClick={() => {
+            displayMarkerInfo(new window.google.maps.LatLng(
+              homeUK.lat,
+              homeUK.lng
+            ));
+            setTimeout(() => alert("This is my home in United Kingdom !"), 500);
+          }}
         />
         {/*<MarkerClusterer renderer={rendererCluster}>
           {(clusterer) =>
