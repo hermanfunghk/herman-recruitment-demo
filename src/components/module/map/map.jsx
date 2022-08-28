@@ -49,7 +49,7 @@ const Map = () => {
   };
 
   const onClickDisplayMarkerInfo = (position, message) => {
-    let rand = Math.random() * 0.00001;
+    let rand = Math.random() * 0.0000001;
     setCenter({
       lat: position.lat + rand,
       lng: position.lng + rand,
