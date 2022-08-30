@@ -25,13 +25,14 @@ const sampleLocations = {
     { lat: -43.999792, lng: 170.463352 },
   ],
   homeLocations: [
-    { lat: 22.483364, lng: 114.139587, id: "HK", description: "Hong Kong" },
-    { lat: 2.970399, lng: 101.659614, id: "MY", description: "Malaysia" },
-    {
+    { lat: 22.483364, lng: 114.139587, id: "HK", label:"HK", description: "Hong Kong", title:`This is my home in Hong Kong`, },
+    { lat: 2.970399, lng: 101.659614, id: "MY",  label:"MY", description: "Malaysia", title:`This is my home in Malaysia`, },
+    { 
       lat: 53.3943374,
       lng: -2.6068253,
-      id: "UK",
-      description: "United Kingdom",
+      id: "UK", label:"UK", 
+      description: "United Kingdom", 
+      title:`This is my home in United Kingdom`,
     },
   ],
 };

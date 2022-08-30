@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import {
   GoogleMap,
   useLoadScript,
-  Marker,
-  Circle /*, MarkerClusterer */,
+  Circle,
 } from "@react-google-maps/api";
-// import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import "../../../stylesheet/map.css";
-import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
 import sampleLocations from "./sampleLocations";
 import { setCustomGoogleMapMarkers } from "./setCustomGoogleMapMarkers";
 
@@ -16,6 +13,7 @@ const Map = () => {
   const [zoomLevel, setZoomLevel] = useState(11);
   const [center, setCenter] = useState({ lat: 22.483364, lng: 114.139587 });
   const [markerMessage, setMarkerMessage] = useState("");
+  const [infoWindow, setInfoWindow] = useState();
   const mapRef = React.useRef(map);
   const setMap = (map) => {
     mapRef.current = map;
@@ -29,13 +27,22 @@ const Map = () => {
   });
 
   const onLoad = React.useCallback(function callback(map) {
-    fitBoundByLocations(map, sampleLocations.homeLocations);
+    const infoWindow = new window.google.maps.InfoWindow();
+    setInfoWindow(infoWindow);
     setMap(map);
     setCustomGoogleMapMarkers(
       map,
       sampleLocations.ausLocations,
-      onClickDisplayMarkerInfo
+      infoWindow,
+      mapCenterAndZoom
     );
+    setCustomGoogleMapMarkers(
+      map,
+      sampleLocations.homeLocations,
+      infoWindow,
+      mapCenterAndZoom
+    );
+    fitBoundByLocations(map, sampleLocations.homeLocations);
   }, []);
 
   const onUnmount = React.useCallback(function callback(map) {
@@ -43,12 +50,13 @@ const Map = () => {
   }, []);
 
   const fitBoundByLocations = (map, locations) => {
+    infoWindow && infoWindow.close(); //close the infoWindow before fitBounds, otherwise map will pan to the infoWindow after fitBounds.
     const bounds = new window.google.maps.LatLngBounds();
     locations.forEach((home) => bounds.extend(home));
     map.fitBounds(bounds);
   };
 
-  const onClickDisplayMarkerInfo = (position, message) => {
+  const mapCenterAndZoom = (position) => {
     let rand = Math.random() * 0.0000001;
     setCenter({
       lat: position.lat + rand,
@@ -56,7 +64,6 @@ const Map = () => {
     });
 
     setZoomLevel(18 + rand);
-    setMarkerMessage(message);
   };
 
   if (!isLoaded) return <p>Loading...</p>;
@@ -81,28 +88,6 @@ const Map = () => {
         onLoad={onLoad}
         onUnmount={onUnmount}
       >
-        {sampleLocations.homeLocations.map((home) => (
-          <Marker
-            key={home.id}
-            position={home}
-            icon={{
-              path: faLocationPin.icon[4],
-              fillColor: "#0000ff",
-              fillOpacity: 1,
-              strokeWeight: 1,
-              strokeColor: "#ffffff",
-              scale: 0.075,
-            }}
-            label={home.id}
-            onClick={() => {
-              onClickDisplayMarkerInfo(
-                home,
-                `This is my home in ${home.description} !`
-              );
-            }}
-          />
-        ))}
-
         <Circle
           center={sampleLocations.homeLocations.find(
             (location) => location.id === "HK"

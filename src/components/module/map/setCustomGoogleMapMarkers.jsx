@@ -3,12 +3,14 @@ import { MarkerClusterer } from "@googlemaps/markerclusterer";
 export const setCustomGoogleMapMarkers = (
   map,
   locations,
-  onClickDisplayMarkerInfo
+  infoWindow,
+  mapCenterAndZoom,
 ) => {
   locations.forEach((location) => (location.count = 1)); //mocking the velocity map view, set count property
 
   var markerIcon = {
     path: "M13.5796046,38.8603699 L14.5,40 L14.5,40 L15.4203954,38.8603699 L15.4203954,38.8603699 L16.3106139,37.7414157 C16.456469,37.5566463 16.6010666,37.3727384 16.7444069,37.1896919 L17.58936,36.1017514 L17.58936,36.1017514 L18.4041363,35.0344866 L18.4041363,35.0344866 L19.1887357,33.9878976 L19.1887357,33.9878976 L19.9431582,32.9619844 C20.0663805,32.7927219 20.1883455,32.6243208 20.3090531,32.4567813 L21.0182102,31.4618818 L21.0182102,31.4618818 L21.6971904,30.4876581 L21.6971904,30.4876581 L22.3459938,29.5341102 C23.1909469,28.2764969 23.9554284,27.0740191 24.6394381,25.9266767 L25.1373569,25.0765078 C27.7124523,20.5974092 29,17.000478 29,14.2857143 C29,6.39593215 22.5081289,0 14.5,0 C6.49187113,0 0,6.39593215 0,14.2857143 C0,16.5762962 0.916623309,19.4949055 2.74986993,23.0415422 L3.17234651,23.8400216 C3.39112903,24.2444302 3.62122789,24.6565923 3.86264308,25.0765078 L4.36056191,25.9266767 C5.04457163,27.0740191 5.80905307,28.2764969 6.65400624,29.5341102 L7.30280957,30.4876581 L7.30280957,30.4876581 L7.9817898,31.4618818 L7.9817898,31.4618818 L8.69094693,32.4567813 C8.81165453,32.6243208 8.93361949,32.7927219 9.05684183,32.9619844 L9.81126431,33.9878976 L9.81126431,33.9878976 L10.5958637,35.0344866 L10.5958637,35.0344866 L11.41064,36.1017514 L11.41064,36.1017514 L12.2555931,37.1896919 L12.2555931,37.1896919 L13.1307232,38.2983083 C13.279093,38.4848007 13.4287201,38.6721546 13.5796046,38.8603699 L13.5796046,38.8603699 Z",
+
     fillColor: "#0591E5",
     fillOpacity: 1,
     strokeWeight: 0,
@@ -33,17 +35,22 @@ export const setCustomGoogleMapMarkers = (
         position: location,
         icon: markerIcon,
         label: {
-          text: String(location.count),
+          text: location.label || String(location.count),
           color: "#fff",
           fontSize: "16px",
         },
+        title: location.title || `Position: (lat:${location.lat}, lng:${location.lng})`
       });
       marker.count = location.count;
       marker.addListener("click", (e) => {
-        onClickDisplayMarkerInfo(
-          location,
-          `Position: (lat:${location.lat}, lng:${location.lng})`
+        mapCenterAndZoom(
+          location
         );
+        if (infoWindow) {
+          infoWindow.close();
+          infoWindow.setContent(marker.getTitle());
+          infoWindow.open(marker.getMap(), marker)
+        }
       });
       return marker;
     });
