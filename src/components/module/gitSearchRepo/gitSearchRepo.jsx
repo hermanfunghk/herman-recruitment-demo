@@ -43,8 +43,8 @@ const GitSearchRepo = () => {
       .catch(console.error);
   }, []);
 
-  const handleSearchChange = async (query) => {
-    setSearchQuery(query);
+  const handleSearchChange = async (e) => {
+    setSearchQuery(e.currentTarget.value);
     setCurrentPage(1);
   };
 
