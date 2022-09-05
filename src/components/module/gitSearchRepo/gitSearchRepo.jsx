@@ -50,6 +50,7 @@ const GitSearchRepo = () => {
 
   const handleSort = (sortColumn) => {
     setSortColumn(sortColumn);
+    searchRepo();
   };
 
   const blurHandler = async (e) => {

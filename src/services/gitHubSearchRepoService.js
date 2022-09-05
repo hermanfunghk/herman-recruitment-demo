@@ -1,5 +1,5 @@
 import http from "./httpService";
-import { gitHubApiSearchRepoUrl } from "../config.json";
+import config from "../config.json";
 
 const DEFAULT_PAGE_SIZE = 25;
 const DEFAULT_PAGE_NUM = 1;
@@ -15,7 +15,7 @@ export function getGitHubSearchRepo(queryStr, pageSize, pageNum, sortColumn) {
   if (!sortColumn) sortColumn = DEFAULT_SORT_COLUMN;
 
   return http.get(
-    gitHubApiSearchRepoUrl +
+    config.gitHubApiSearchRepoUrl +
       "?q=" +
       queryStr +
       "&sort=" +
