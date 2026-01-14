@@ -18,7 +18,7 @@ async function fetchGitHubSearchRepo(queryStr, pageSize, pageNum, sortColumn) {
   url.searchParams.set("page", pageNum);
 
   const headers = {};
-  const token = process.env.REACT_APP_GITHUB_TOKEN;
+  const token = import.meta.env.VITE_GITHUB_TOKEN;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
