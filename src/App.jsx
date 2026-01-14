@@ -1,4 +1,4 @@
-import { Route, Navigate, Routes } from "react-router-dom";
+import { Route, Navigate, Routes } from "react-router";
 import { ToastContainer } from "react-toastify";
 import GitSearchRepo from "./components/module/gitSearchRepo/gitSearchRepo";
 import Map from "./components/module/map/map";
