@@ -23,7 +23,7 @@ const Map = () => {
   //Load google map script hook
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_APIKEY,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_APIKEY,
   });
 
   const onLoad = React.useCallback(function callback(map) {
