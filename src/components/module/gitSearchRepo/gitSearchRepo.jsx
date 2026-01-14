@@ -1,68 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import GitSearchRepoResultTable from "./gitSearchRepoResultTable";
-import { getGitHubSearchRepo } from "../../../services/gitHubSearchRepoService";
-//import _ from "lodash";
+import { useGitHubSearchRepo } from "../../../services/gitHubSearchRepoService";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 import SearchBox from "../../common/searchBox";
 
 const GitSearchRepo = () => {
-  const [gitSearchRepoResult, setGitSearchRepoResult] = useState([]);
-  const [total_count, setTotal_count] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  // eslint-disable-next-line
-  const [pageSize, setPageSize] = useState(25);
-  const [searchQuery, setSearchQuery] = useState("oracle");
+  const [pageSize] = useState(25);
+  const [inputValue, setInputValue] = useState("oracle");
   const [sortColumn, setSortColumn] = useState({
     path: "stargazers_count",
     sortPath: "stars",
     order: "desc",
   });
 
-  const searchRepo = async () => {
-    if (searchQuery.trim() === "") setGitSearchRepoResult([]);
-    else {
-      const {
-        data: { items: gitSearchRepoResult, total_count },
-      } = await getGitHubSearchRepo(
-        searchQuery,
-        pageSize,
-        currentPage,
-        sortColumn
-      );
+  const debouncedSearchQuery = useDebouncedValue(inputValue, 500);
 
-      gitSearchRepoResult.map((i) => (i._id = i.id));
+  const { data, isLoading, error } = useGitHubSearchRepo(
+    debouncedSearchQuery,
+    pageSize,
+    currentPage,
+    sortColumn
+  );
 
-      setGitSearchRepoResult(gitSearchRepoResult);
-      setTotal_count(total_count);
+  const gitSearchRepoResult = data?.items || [];
+  const total_count = data?.total_count || 0;
+
+  const handleSearchChange = (e) => {
+    setInputValue(e.currentTarget.value);
+    setCurrentPage(1);
+  };
+
+  const handleSort = (newSortColumn) => {
+    setSortColumn(newSortColumn);
+  };
+
+  const blurHandler = (e) => {
+    setInputValue(e.currentTarget.value);
+    setCurrentPage(1);
+  };
+
+  const keyDownHandler = (e) => {
+    if (e.key === "Enter") {
+      setInputValue(e.currentTarget.value);
+      setCurrentPage(1);
     }
-  };
-
-  useEffect(() => {
-    // call the function
-    searchRepo()
-      // make sure to catch any error
-      .catch(console.error);
-  }, []);
-
-  const handleSearchChange = async (e) => {
-    setSearchQuery(e.currentTarget.value);
-    setCurrentPage(1);
-  };
-
-  const handleSort = (sortColumn) => {
-    setSortColumn(sortColumn);
-    searchRepo();
-  };
-
-  const blurHandler = async (e) => {
-    setSearchQuery(e.currentTarget.value);
-    setCurrentPage(1);
-    await searchRepo();
-  };
-
-  const keyPressHandler = async (e) => {
-    setSearchQuery(e.currentTarget.value);
-    setCurrentPage(1);
-    if (e.key === "Enter") await searchRepo();
   };
 
   const resultRangeStart = () => {
@@ -73,59 +55,44 @@ const GitSearchRepo = () => {
     return resultRangeStart() + gitSearchRepoResult.length - 1;
   };
 
-  const onNextPage = async () => {
+  const onNextPage = () => {
     setCurrentPage(currentPage + 1);
-    setSortColumn(sortColumn);
-    searchRepo();
   };
 
-  const onPrevPage = async () => {
+  const onPrevPage = () => {
     setCurrentPage(currentPage - 1);
-    setSortColumn(sortColumn);
-    searchRepo();
   };
 
-  /*const handleSort = (sortColumn) => {
-    this.setState({ sortColumn });
-    this.searchRepo(this.state.currentPage, sortColumn);
-  };*/
-
-  const { length: count } = gitSearchRepoResult;
   const rangeStart = resultRangeStart();
   const rangeEnd = resultRangeEnd();
+  const count = gitSearchRepoResult.length;
+  const showPrevButton = rangeStart > 1;
+  const showNextButton = total_count > rangeEnd;
 
-  if (count === 0)
+  const renderContent = () => {
+    if (isLoading) {
+      return <p>Loading git repositories...</p>;
+    }
+
+    if (error) {
+      return <p>Error loading repositories: {error.message}</p>;
+    }
+
+    if (count === 0) {
+      return <p>There are no matched git repository.</p>;
+    }
+
     return (
-      <div>
-        <p>There are no matched git repository.</p>
-        <SearchBox
-          defaultValue={searchQuery}
-          onBlur={blurHandler}
-          onKeyPress={keyPressHandler}
-        />
-      </div>
-    );
-
-  return (
-    <div className="row">
-      <div className="col">
+      <>
         <p>Total {total_count} git repositories found.</p>
-        <p>
-          Showing {resultRangeStart()} - {resultRangeEnd()} git repositories.
-        </p>
-        <SearchBox
-          defaultValue={searchQuery}
-          onChange={handleSearchChange}
-          onBlur={blurHandler}
-          onKeyPress={keyPressHandler}
-        />
-        {rangeStart > 1 && (
-          <a className="btn btn-primary m-1" onClick={() => onPrevPage()}>
+        <p>Showing {rangeStart} - {rangeEnd} git repositories.</p>
+        {showPrevButton && (
+          <a className="btn btn-primary m-1" onClick={onPrevPage}>
             Prev {pageSize}
           </a>
         )}
-        {total_count > rangeEnd && (
-          <a className="btn btn-primary m-1" onClick={() => onNextPage()}>
+        {showNextButton && (
+          <a className="btn btn-primary m-1" onClick={onNextPage}>
             Next {pageSize}
           </a>
         )}
@@ -134,6 +101,20 @@ const GitSearchRepo = () => {
           sortColumn={sortColumn}
           onSort={handleSort}
         />
+      </>
+    );
+  };
+
+  return (
+    <div className="row">
+      <div className="col">
+        <SearchBox
+          defaultValue={inputValue}
+          onChange={handleSearchChange}
+          onBlur={blurHandler}
+          onKeyDown={keyDownHandler}
+        />
+        {renderContent()}
       </div>
     </div>
   );

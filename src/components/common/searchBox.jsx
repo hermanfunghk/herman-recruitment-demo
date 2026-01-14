@@ -1,6 +1,6 @@
 import React from "react";
 
-const SearchBox = ({ defaultValue, onChange, onBlur, onKeyPress }) => {
+const SearchBox = ({ defaultValue, onChange, onBlur, onKeyDown }) => {
   return (
     <input
       type="text"
@@ -8,9 +8,9 @@ const SearchBox = ({ defaultValue, onChange, onBlur, onKeyPress }) => {
       className="form-control my-3"
       placeholder="Search..."
       defaultValue={defaultValue}
-      onBlur={(e) => onBlur(e)}
-      onKeyPress={(e) => onKeyPress(e)}
-      onChange={(e) => onChange(e)}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      onChange={onChange}
     />
   );
 };
