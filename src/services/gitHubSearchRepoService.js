@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import config from "../config.json";
 
 const DEFAULT_PAGE_SIZE = 25;
 const DEFAULT_PAGE_NUM = 1;
@@ -10,7 +9,7 @@ const DEFAULT_SORT_COLUMN = {
 };
 
 async function fetchGitHubSearchRepo(queryStr, pageSize, pageNum, sortColumn) {
-  const url = new URL(config.gitHubApiSearchRepoUrl);
+  const url = new URL(import.meta.env.VITE_GITHUB_API_SEARCH_REPO_URL);
   url.searchParams.set("q", queryStr);
   url.searchParams.set("sort", sortColumn.sortPath);
   url.searchParams.set("order", sortColumn.order);
